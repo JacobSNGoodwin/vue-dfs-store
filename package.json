@@ -1,0 +1,17 @@
+{
+  "name": "vue-dfs-store",
+  "version": "0.1.0",
+  "description": "A dead-!@#$%-simple store for VueJS using the built-in Vue reactivity system and inspired by Zustand actions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "vue",
+    "store",
+    "typescript",
+    "state management"
+  ],
+  "author": "Jacob Goodwin",
+  "license": "MIT"
+}
