@@ -13,5 +13,13 @@
     "state management"
   ],
   "author": "Jacob Goodwin",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "eslint": "^7.12.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier-eslint": "^11.0.0",
+    "vue": "^2.6.12"
+  }
 }
