@@ -4,6 +4,7 @@
   "description": "A dead-!@#$%-simple store for VueJS using the built-in Vue reactivity system and inspired by Zustand actions",
   "main": "index.js",
   "scripts": {
+    "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -14,12 +15,15 @@
   ],
   "author": "Jacob Goodwin",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
     "eslint": "^7.12.1",
     "eslint-plugin-prettier": "^3.1.4",
     "prettier-eslint": "^11.0.0",
+    "rollup": "^2.32.1",
+    "typescript": "^4.0.5",
     "vue": "^3.0.2"
   }
 }
