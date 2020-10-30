@@ -20,6 +20,6 @@
     "eslint": "^7.12.1",
     "eslint-plugin-prettier": "^3.1.4",
     "prettier-eslint": "^11.0.0",
-    "vue": "^2.6.12"
+    "vue": "^3.0.2"
   }
 }
