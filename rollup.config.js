@@ -18,8 +18,8 @@ export default [
       },
       {
         // dir: 'dist',
-        file: 'dist/index.iife.js',
-        format: 'iife',
+        file: 'dist/index.umd.js',
+        format: 'umd',
         exports: 'named',
         name: 'vuedfs',
         sourcemap: true,
@@ -28,6 +28,7 @@ export default [
     external: ['vue'],
     plugins: [typescript()],
   },
+  // this config applies settings for creating type declarations
   {
     input: 'src/index.ts',
     output: {
