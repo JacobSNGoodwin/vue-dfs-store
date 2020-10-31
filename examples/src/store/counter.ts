@@ -10,7 +10,7 @@ type CounterActions = {
 };
 
 type CounterGetters = {
-  doubleCount: () => number;
+  multCount: (multiplier: number) => number;
 };
 
 const counterStore = createStore<CounterState, CounterActions, CounterGetters>({
@@ -23,7 +23,7 @@ const counterStore = createStore<CounterState, CounterActions, CounterGetters>({
     clearCount: () => mutate(state => (state.count = 0)),
   }),
   gettersCreator: state => ({
-    doubleCount: () => 2 * state.count,
+    multCount: multiplier => multiplier * state.count,
   }),
 });
 

@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './routes';
 import counterStore from './store/counter';
 
-// import router from './router';
+import './index.css';
 
 createApp(App)
   .use(router)

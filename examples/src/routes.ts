@@ -6,12 +6,12 @@ import FetchData from './views/FetchData.vue';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'counter',
+    name: 'Counter',
     component: Counter,
   },
   {
     path: '/fetch-data',
-    name: 'fetchData',
+    name: 'Fetch Data',
     component: FetchData,
   },
 ];

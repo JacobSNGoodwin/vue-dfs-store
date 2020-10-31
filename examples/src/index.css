@@ -1,0 +1,47 @@
+body {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: rgba(25, 25, 25, 0.75);
+}
+
+a {
+  color: rgba(25, 25, 25, 0.75);
+  text-decoration: none;
+}
+
+a:visited {
+  color: rgba(25, 25, 25, 0.75);
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.6;
+}
+
+button {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 18px;
+  color: rgba(25, 25, 25, 0.75);
+  padding: 8px;
+  min-width: 80px;
+  min-height: 36px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border-color: rgba(25, 25, 25, 0.75);
+  border-width: 2px;
+  font-weight: bold;
+  margin: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+h1 {
+  font-weight: 900;
+}
+
+h2 {
+  font-weight: 400;
+}

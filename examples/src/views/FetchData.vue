@@ -3,19 +3,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import counterStore from '../store/counter';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'App',
   setup() {
-    const { state, actions, getters } = counterStore.useStore();
+    const dummy = ref('bla');
 
     return {
-      count: state.count,
-      doubleCount: getters.doubleCount,
-      incCount: actions.incCount,
-      clearCount: actions.clearCount,
+      dummy,
     };
   },
 });
