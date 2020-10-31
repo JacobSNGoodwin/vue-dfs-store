@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "commonjs",
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -10,9 +10,10 @@
     "importHelpers": true,
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "outDir": "dist",
-    "declarationDir": "dist",
-    "declaration": true
+    // "rootDir": "src",
+    // "declaration": true,
+    // "declarationDir": "dist",
+    // "outDir": "dist"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
