@@ -8,6 +8,7 @@ import {
   toRefs,
   computed,
   ComputedRef,
+  App,
 } from 'vue';
 
 // State is a plain old object that can be provided in the config
@@ -40,7 +41,7 @@ export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 // of an action
 export type GetState<T> = () => ReactiveState<T>;
 
-// Actions Creator provides actions with a 
+// Actions Creator provides actions with a
 // mutator to make state changes and a get to access state
 // inside of actions.
 export type ActionsCreator<T extends State, U extends Actions> = (
@@ -54,7 +55,6 @@ export type ActionsCreator<T extends State, U extends Actions> = (
 export type GettersCreator<T extends State, V extends Getters> = (
   state: ReactiveState<T>
 ) => V;
-
 
 // CreateStoreConfig used to initialize the state
 // and define actions and getters.
@@ -72,16 +72,15 @@ export type CreateStoreConfig<
   gettersCreator: GettersCreator<T, V>;
 };
 
-
 // ComputedGetterRefs wraps all getters defined in GettersCreator
-// with vue's ComputedRef. 
+// with vue's ComputedRef.
 // For typing help, we make sure the keys and return types
 // of the the getters is maintained.
 export type ComputedGetterRefs<T extends Getters> = {
   [K in keyof T]: ComputedRef<ReturnType<T[K]>>;
 };
 
-// Store is returned by useStore() composable. 
+// Store is returned by useStore() composable.
 // It will provide Vue Components access to state, actions, and
 // getters.
 export type Store<T extends State, U extends Actions, V extends Getters> = {
@@ -90,22 +89,29 @@ export type Store<T extends State, U extends Actions, V extends Getters> = {
   getters: ComputedGetterRefs<V>;
 };
 
+export type StoreAPI<T extends State, U extends Actions, V extends Getters> = {
+  provider: Plugin;
+  useStore: () => Store<T, U, V>;
+};
+
 // createStore initializes the store
 // It returns access to an plugin to be applied in
 // App.use(). This provides any components at a lower
-// tree-level to access the store. 
+// tree-level to access the store.
 // TODO - add to vue context for access in Options API
 export function createStore<
   TState extends State,
   TActions extends Actions,
   TGetters extends Getters
->(config: CreateStoreConfig<TState, TActions, TGetters>) {
+>(
+  config: CreateStoreConfig<TState, TActions, TGetters>
+): StoreAPI<TState, TActions, TGetters> {
   const reactiveState = reactive(config.initialState);
 
   const { actionsCreator, gettersCreator } = config;
 
   // TODO - create history tracking / state snapshots
-  const mutate: Mutator<TState> = mutatorFunc => {
+  const mutate: Mutator<TState> = (mutatorFunc) => {
     mutatorFunc(reactiveState);
     // console.log('New reactive state: ', reactiveState);
   };
@@ -115,7 +121,6 @@ export function createStore<
 
   const actions = actionsCreator(mutate, get);
   const getters = gettersCreator(reactiveState);
-
 
   // Wrap getters in vue's computed
   const computedGetterRefs: ComputedGetterRefs<TGetters> = Object.assign({});
@@ -140,13 +145,15 @@ export function createStore<
 
   // for use with App.use()
   const provider: Plugin = {
-    install: app => {
+    install: (app: App) => {
       app.provide(StoreSymbol, store);
     },
   };
 
   // useStore can be used in a setup() of components to inject the store from
   // the provider (installed in App.use()).
+  // const injector = inject<Store<TState, TActions, TGetters>>(StoreSymbol);
+
   const useStore = () => {
     const store = inject<Store<TState, TActions, TGetters>>(StoreSymbol);
     if (!store) {

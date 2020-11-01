@@ -1,12 +1,8 @@
 {
-  "extends": ["eslint:recommended"],
-  "plugins": [
-    "@typescript-eslint",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "root": true,
   "parser": "@typescript-eslint/parser",
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "prettier/prettier": "warn"
   }
