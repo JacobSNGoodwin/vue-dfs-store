@@ -8,7 +8,9 @@
   "dist": {},
   "scripts": {
     "build": "rollup -c",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "rollup -cw",
+    "ts": "tsc --outDir dist -d",
+    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,8 @@
   "author": "Jacob Goodwin",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-node-resolve": "^10.0.0",
     "@rollup/plugin-typescript": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
@@ -31,6 +35,9 @@
     "prettier-eslint": "^11.0.0",
     "rollup": "^2.32.1",
     "typescript": "^4.0.5",
+    "vue": "^3.0.2"
+  },
+  "peerDependencies": {
     "vue": "^3.0.2"
   }
 }

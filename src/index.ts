@@ -27,14 +27,14 @@ export type GetterFunc<T> = (ctx?: any) => T; // using unexported type from vue
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Getters = Record<string, GetterFunc<any>>;
 
+// MutatorrFunc receives the state for mutating.
+// Is there anyway to enforce a syncronous function?
+export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
+
 // Mutator will receive access to the Mutator func which receives the state
 // All mutations should be syncronous.
 // This will allow Mutator to track history or snapshots in later versions.
 export type Mutator<T> = (mutator: MutatorFunc<T>) => void;
-
-// MutatorrFunc receives the state for mutating.
-// Is there anyway to enforce a syncronous function?
-export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 
 // GetState used to access the state (which is readonly) inside
 // of an action
@@ -114,8 +114,8 @@ const createStore = <
     // console.log('New reactive state: ', reactiveState);
   };
 
-  // for providing state to an action create
-  const get = () => reactiveState;
+  // for providing state to an action creator
+  const get = (): ReactiveState<TState> => reactiveState;
 
   const actions = actionsCreator(mutate, get);
   const getters = gettersCreator(reactiveState);
@@ -137,7 +137,7 @@ const createStore = <
   // Create symbol from store name
   // This key will be use for injecting store
   // inside of setup functions
-  const storeKey = Symbol(name);
+  const storeKey = Symbol(config.name);
 
   // for use with App.use(),
   // it will allow providing the store in app.use

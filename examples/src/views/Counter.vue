@@ -1,20 +1,14 @@
 <template>
-  <h2>Counter</h2>
-  <h3>Count: {{ count }}</h3>
-
-  <!-- <h4>Multiplier</h4>
-  <input type="number" v-model.number="multiplier" /> -->
-
-  <!-- <h3>{{ multiplier }} x Count: {{ multipliedCount }}</h3> -->
-
-  <div class="buttons">
-    <button type="button" @click="incCount(1)">
-      +
-    </button>
-    <button type="button" @click="incCount(-1)">
-      -
-    </button>
-    <button type="button" @click="clearCount">
+  <h2>Count: {{ count }}</h2>
+  <h2>Double Count: {{ doubleCount }}</h2>
+  <button @click="incCount(1)">
+    +
+  </button>
+  <button @click="incCount(-1)">
+    -
+  </button>
+  <div>
+    <button @click="clearCount">
       Clear
     </button>
   </div>
@@ -28,19 +22,13 @@ import counterStore from '../store/counter';
 export default defineComponent({
   name: 'Counter',
   setup() {
-    // const multiplier = ref(1);
-    const { state, actions } = useStore(counterStore);
-
-    // const multipliedValue = computed(
-    //   multiplier => multiplier * state.count.value
-    // );
+    const { state, actions, getters } = useStore(counterStore);
 
     return {
       count: state.count,
+      doubleCount: getters.doubleCount,
       incCount: actions.incCount,
       clearCount: actions.clearCount,
-      // multiplier,
-      // multipliedValue,
     };
   },
 });
