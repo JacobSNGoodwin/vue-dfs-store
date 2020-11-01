@@ -6,6 +6,6 @@ import counterStore from './store/counter';
 import './index.css';
 
 createApp(App)
-  .use(counterStore.provider)
+  .use(counterStore)
   .use(router)
   .mount('#app');

@@ -22,13 +22,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useStore } from 'vue-dfs-store';
 import counterStore from '../store/counter';
 
 export default defineComponent({
   name: 'Counter',
   setup() {
     // const multiplier = ref(1);
-    const { state, actions } = counterStore.useStore();
+    const { state, actions } = useStore(counterStore);
 
     // const multipliedValue = computed(
     //   multiplier => multiplier * state.count.value

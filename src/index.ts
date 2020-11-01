@@ -1,14 +1,13 @@
 import {
   Ref,
   UnwrapRef,
-  Plugin,
-  inject,
   reactive,
   ToRefs,
   toRefs,
   computed,
   ComputedRef,
   App,
+  inject,
 } from 'vue';
 
 // State is a plain old object that can be provided in the config
@@ -80,32 +79,31 @@ export type ComputedGetterRefs<T extends Getters> = {
   [K in keyof T]: ComputedRef<ReturnType<T[K]>>;
 };
 
-// Store is returned by useStore() composable.
-// It will provide Vue Components access to state, actions, and
-// getters.
-export type Store<T extends State, U extends Actions, V extends Getters> = {
+export type StoreAPI<T extends State, U extends Actions, V extends Getters> = {
   readonly state: ToRefs<ReactiveState<T>>;
   actions: U;
   getters: ComputedGetterRefs<V>;
 };
 
-export type StoreAPI<T extends State, U extends Actions, V extends Getters> = {
-  provider: Plugin;
-  useStore: () => Store<T, U, V>;
+// Store is returned by createStore()
+export type Store<T extends State, U extends Actions, V extends Getters> = {
+  readonly name: string;
+  storeAPI: StoreAPI<T, U, V>;
+  install: (app: App) => void; // makes Store implement Plugin from vue
+  readonly storeKey: symbol;
 };
 
 // createStore initializes the store
-// It returns access to an plugin to be applied in
-// App.use(). This provides any components at a lower
+// The store contains an install() method so we can use it
+// with App.use(). This provides any components at a lower
 // tree-level to access the store.
-// TODO - add to vue context for access in Options API
-export function createStore<
+const createStore = <
   TState extends State,
   TActions extends Actions,
   TGetters extends Getters
 >(
   config: CreateStoreConfig<TState, TActions, TGetters>
-): StoreAPI<TState, TActions, TGetters> {
+): Store<TState, TActions, TGetters> => {
   const reactiveState = reactive(config.initialState);
 
   const { actionsCreator, gettersCreator } = config;
@@ -130,40 +128,43 @@ export function createStore<
     computedGetterRefs[key] = computed(getterFunc);
   }
 
-  const store: Store<TState, TActions, TGetters> = {
+  const storeAPI: StoreAPI<TState, TActions, TGetters> = {
     state: toRefs(reactiveState),
     actions: actions,
     getters: computedGetterRefs,
   };
 
   // Create symbol from store name
-  // Can we add some sort of unique tag at the end of the name?
-  const StoreSymbol = Symbol(name);
+  // This key will be use for injecting store
+  // inside of setup functions
+  const storeKey = Symbol(name);
 
-  // for providing within setup() instead of a plugin
-  // const provider = () => provide(StoreSymbol, state);
-
-  // for use with App.use()
-  const provider: Plugin = {
-    install: (app: App) => {
-      app.provide(StoreSymbol, store);
-    },
+  // for use with App.use(),
+  // it will allow providing the store in app.use
+  // TODO: export a provider directly to use down-tree? Add to global context?
+  const install = (app: App) => {
+    app.provide(storeKey, storeAPI);
   };
 
-  // useStore can be used in a setup() of components to inject the store from
-  // the provider (installed in App.use()).
-  // const injector = inject<Store<TState, TActions, TGetters>>(StoreSymbol);
-
-  const useStore = () => {
-    const store = inject<Store<TState, TActions, TGetters>>(StoreSymbol);
-    if (!store) {
-      throw new Error(`${config.name} has not been instantiated!`);
-    }
-    return store;
+  const store: Store<TState, TActions, TGetters> = {
+    name: config.name,
+    storeAPI,
+    install,
+    storeKey,
   };
 
-  return {
-    provider,
-    useStore,
-  };
-}
+  return store;
+};
+
+const useStore = <T extends State, U extends Actions, V extends Getters>(
+  store: Store<T, U, V>
+): StoreAPI<T, U, V> => {
+  const storeAPI = inject<StoreAPI<T, U, V>>(store.storeKey);
+  if (!storeAPI) {
+    throw new Error(`${store.name} has not been initialized}`);
+  }
+
+  return storeAPI;
+};
+
+export { createStore, useStore };
