@@ -18,12 +18,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+// import counterStore from './store/counter';
 
 export default defineComponent({
   name: 'App',
   setup() {
+    // counterStore.provider();
     const router = useRouter();
-
     return {
       appRoutes: router.getRoutes(),
     };

@@ -5,6 +5,7 @@ import {
   ToRefs,
   toRefs,
   computed,
+  provide,
   ComputedRef,
   App,
   inject,
@@ -91,6 +92,7 @@ export type Store<T extends State, U extends Actions, V extends Getters> = {
   storeAPI: StoreAPI<T, U, V>;
   install: (app: App) => void; // makes Store implement Plugin from vue
   readonly storeKey: symbol;
+  provider: () => void;
 };
 
 // createStore initializes the store
@@ -137,7 +139,7 @@ const createStore = <
   // Create symbol from store name
   // This key will be use for injecting store
   // inside of setup functions
-  const storeKey = Symbol(config.name);
+  const storeKey = Symbol();
 
   // for use with App.use(),
   // it will allow providing the store in app.use
@@ -146,11 +148,14 @@ const createStore = <
     app.provide(storeKey, storeAPI);
   };
 
+  const provider = () => provide(storeKey, storeAPI);
+
   const store: Store<TState, TActions, TGetters> = {
     name: config.name,
     storeAPI,
     install,
     storeKey,
+    provider,
   };
 
   return store;
