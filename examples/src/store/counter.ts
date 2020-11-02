@@ -1,4 +1,4 @@
-import { createStore } from 'vue-dfs-store';
+import { createStore } from '../../../dist';
 
 type CounterState = {
   count: number;

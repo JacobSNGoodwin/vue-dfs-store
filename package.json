@@ -8,8 +8,11 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "ts": "tsc --outDir dist -d",
-    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'"
+    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
+    "serve-client": "vue-cli-service serve examples/src/main.ts",
+    "build-client": "vue-cli-service build examples/src/main.ts",
+    "lint-client": "vue-cli-service lint examples",
+    "dev": "npm run watch & npm run serve-client"
   },
   "files": [
     "dist/*js",
@@ -33,12 +36,24 @@
     "@rollup/plugin-typescript": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "core-js": "^3.6.5",
     "eslint": "^7.12.1",
     "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-vue": "^7.0.0-0",
     "prettier-eslint": "^11.0.0",
+    "prettier": "^1.19.1",
     "rollup": "^2.32.1",
     "typescript": "^4.0.5",
-    "vue": "^3.0.0"
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0-rc.1"
   },
   "peerDependencies": {
     "vue": "^3.0.0"

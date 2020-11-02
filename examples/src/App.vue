@@ -18,7 +18,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
-// import counterStore from './store/counter';
 
 export default defineComponent({
   name: 'App',

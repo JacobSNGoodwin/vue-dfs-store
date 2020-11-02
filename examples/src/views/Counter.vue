@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useStore } from 'vue-dfs-store';
+import { useStore } from '../../../dist';
 import counterStore from '../store/counter';
 
 export default defineComponent({
