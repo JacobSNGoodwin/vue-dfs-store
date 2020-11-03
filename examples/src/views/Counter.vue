@@ -27,14 +27,16 @@ export default defineComponent({
   name: 'Counter',
   setup() {
     const multiplier = ref(0);
-    const { state, actions } = useStore(counterStore);
+    const { state, accessors } = useStore(counterStore);
 
-    const multipliedCount = computed(() => actions.multCount(multiplier.value));
+    const multipliedCount = computed(() =>
+      accessors.multCount(multiplier.value)
+    );
 
     return {
       count: state.count,
-      incCount: actions.incCount,
-      clearCount: actions.clearCount,
+      incCount: accessors.incCount,
+      clearCount: accessors.clearCount,
       multiplier,
       multipliedCount,
     };

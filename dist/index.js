@@ -14,10 +14,10 @@ const createStore = (config) => {
     };
     // for providing state to an action creator
     const get = () => readonly(reactiveState);
-    const actions = accessorsCreator(mutate, get);
+    const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
         state: toRefs(readonly(reactiveState)),
-        actions: actions,
+        accessors,
     };
     // Create symbol from store name
     // This key will be use for injecting store

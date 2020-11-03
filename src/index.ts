@@ -55,7 +55,7 @@ export type CreateStoreConfig<T extends State, U extends Accessors> = {
 
 export type StoreAPI<T extends State, U extends Accessors> = {
   readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
-  actions: U;
+  accessors: U;
 };
 
 // Store is returned by createStore()
@@ -88,11 +88,11 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   const get = (): ReadonlyState<ReactiveState<TState>> =>
     readonly(reactiveState);
 
-  const actions = accessorsCreator(mutate, get);
+  const accessors = accessorsCreator(mutate, get);
 
   const storeAPI: StoreAPI<TState, TAccessors> = {
     state: toRefs(readonly(reactiveState)),
-    actions: actions,
+    accessors,
   };
 
   // Create symbol from store name

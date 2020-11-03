@@ -15,7 +15,7 @@ export declare type CreateStoreConfig<T extends State, U extends Accessors> = {
 };
 export declare type StoreAPI<T extends State, U extends Accessors> = {
     readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
-    actions: U;
+    accessors: U;
 };
 export declare type Store<T extends State, U extends Accessors> = {
     readonly name: string;
