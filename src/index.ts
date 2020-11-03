@@ -111,7 +111,7 @@ const createStore = <
   const { actionsCreator, gettersCreator } = config;
 
   // TODO - create history tracking / state snapshots
-  const mutate: Mutator<TState> = (mutatorFunc) => {
+  const mutate: Mutator<TState> = mutatorFunc => {
     mutatorFunc(reactiveState);
     // console.log('New reactive state: ', reactiveState);
   };

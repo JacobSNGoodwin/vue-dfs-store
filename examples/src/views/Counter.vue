@@ -1,34 +1,45 @@
 <template>
   <h2>Count: {{ count }}</h2>
-  <h2>Double Count: {{ doubleCount }}</h2>
+  <h2>Count x 2: {{ doubleCount }}</h2>
+
+  <h3>Multiplier</h3>
+  <input type="number" v-model.number="multiplier" />
+
+  <h2>Count x {{ multiplier }} = {{ multipliedCount }}</h2>
+  <h2>Count x {{ multiplier }} = {{ multipliedCount2 }}</h2>
+
   <button @click="incCount(1)">
     +
   </button>
   <button @click="incCount(-1)">
     -
   </button>
-  <div>
-    <button @click="clearCount">
-      Clear
-    </button>
-  </div>
+
+  <button @click="clearCount">
+    Reset Count
+  </button>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useStore } from '../../../dist';
 import counterStore from '../store/counter';
 
 export default defineComponent({
   name: 'Counter',
   setup() {
+    const multiplier = ref(0);
     const { state, actions, getters } = useStore(counterStore);
+
+    const multipliedCount = computed(() => actions.multCount(multiplier.value));
 
     return {
       count: state.count,
-      doubleCount: getters.doubleCount,
       incCount: actions.incCount,
       clearCount: actions.clearCount,
+      multiplier,
+      doubleCount: getters.doubleCount,
+      multipliedCount,
     };
   },
 });
