@@ -1,4 +1,4 @@
-import { reactive, toRefs, inject, provide } from 'vue';
+import { reactive, toRefs, readonly, inject, provide } from 'vue';
 
 // createStore initializes the store
 // The store contains an install() method so we can use it
@@ -6,17 +6,17 @@ import { reactive, toRefs, inject, provide } from 'vue';
 // tree-level to access the store.
 const createStore = (config) => {
     const reactiveState = reactive(config.initialState);
-    const { actionsCreator } = config;
+    const { accessorsCreator } = config;
     // TODO - create history tracking / state snapshots
     const mutate = mutatorFunc => {
         mutatorFunc(reactiveState);
         // console.log('New reactive state: ', reactiveState);
     };
     // for providing state to an action creator
-    const get = () => reactiveState;
-    const actions = actionsCreator(mutate, get);
+    const get = () => readonly(reactiveState);
+    const actions = accessorsCreator(mutate, get);
     const storeAPI = {
-        state: toRefs(reactiveState),
+        state: toRefs(readonly(reactiveState)),
         actions: actions,
     };
     // Create symbol from store name
@@ -25,7 +25,6 @@ const createStore = (config) => {
     const storeKey = Symbol();
     // for use with App.use(),
     // it will allow providing the store in app.use
-    // TODO: export a provider directly to use down-tree? Add to global context?
     const install = (app) => {
         app.provide(storeKey, storeAPI);
     };

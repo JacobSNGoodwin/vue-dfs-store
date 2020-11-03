@@ -7,6 +7,8 @@ import {
   provide,
   App,
   inject,
+  readonly,
+  DeepReadonly,
 } from 'vue';
 
 // State is a plain old object that can be provided in the config
@@ -15,6 +17,7 @@ export type State = Record<string | number | symbol, unknown>;
 // Same UnwrapNestedRef, which Vue doesn't export.
 // The type that would be returned by Vue's reactive(someState)
 export type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
+export type ReadonlyState<T> = DeepReadonly<ReactiveState<T>>;
 
 // Actions can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,29 +35,26 @@ export type Mutator<T> = (mutator: MutatorFunc<T>) => void;
 
 // GetState used to access the state (which is readonly) inside
 // of an action
-export type GetState<T> = () => ReactiveState<T>;
+export type GetState<T> = () => ReadonlyState<ReactiveState<T>>;
 
 // Actions Creator provides actions with a
 // mutator to make state changes and a get to access state
 // inside of actions.
-export type ActionsCreator<T extends State, U extends Accessors> = (
+export type AccessorsCreator<T extends State, U extends Accessors> = (
   mutate: Mutator<T>,
   get: GetState<T>
 ) => U;
 
 // CreateStoreConfig used to initialize the state
 // and define actions and getters.
-// Name is used to create a symbol for vue's provide
-// So keey it unique
-// TODO - check "name" uniqueness
 export type CreateStoreConfig<T extends State, U extends Accessors> = {
   name: string;
   initialState: T;
-  actionsCreator: ActionsCreator<T, U>;
+  accessorsCreator: AccessorsCreator<T, U>;
 };
 
 export type StoreAPI<T extends State, U extends Accessors> = {
-  readonly state: ToRefs<ReactiveState<T>>;
+  readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
   actions: U;
 };
 
@@ -76,7 +76,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
 ): Store<TState, TAccessors> => {
   const reactiveState = reactive(config.initialState);
 
-  const { actionsCreator } = config;
+  const { accessorsCreator } = config;
 
   // TODO - create history tracking / state snapshots
   const mutate: Mutator<TState> = mutatorFunc => {
@@ -85,12 +85,13 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   };
 
   // for providing state to an action creator
-  const get = (): ReactiveState<TState> => reactiveState;
+  const get = (): ReadonlyState<ReactiveState<TState>> =>
+    readonly(reactiveState);
 
-  const actions = actionsCreator(mutate, get);
+  const actions = accessorsCreator(mutate, get);
 
   const storeAPI: StoreAPI<TState, TAccessors> = {
-    state: toRefs(reactiveState),
+    state: toRefs(readonly(reactiveState)),
     actions: actions,
   };
 
@@ -101,7 +102,6 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
 
   // for use with App.use(),
   // it will allow providing the store in app.use
-  // TODO: export a provider directly to use down-tree? Add to global context?
   const install = (app: App) => {
     app.provide(storeKey, storeAPI);
   };
