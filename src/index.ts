@@ -4,9 +4,7 @@ import {
   reactive,
   ToRefs,
   toRefs,
-  computed,
   provide,
-  ComputedRef,
   App,
   inject,
 } from 'vue';
@@ -20,15 +18,10 @@ export type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
 
 // Actions can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ActionFunc = (...args: any[]) => void;
+export type ActionFunc = (...args: any[]) => any;
 export type Actions = Record<string, ActionFunc>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type GetterFunc<T> = (ctx?: any) => T; // using unexported type from vue
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Getters = Record<string, GetterFunc<any>>;
-
-// MutatorrFunc receives the state for mutating.
+// MutatorFunc receives the state for mutating.
 // Is there anyway to enforce a syncronous function?
 export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 
@@ -49,47 +42,26 @@ export type ActionsCreator<T extends State, U extends Actions> = (
   get: GetState<T>
 ) => U;
 
-// GettersCreator provides our reactive state so that
-// methods can be wrapped in vue's "computed," which can
-// track and cache changes to reactive objects.
-export type GettersCreator<T extends State, V extends Getters> = (
-  state: ReactiveState<T>
-) => V;
-
 // CreateStoreConfig used to initialize the state
 // and define actions and getters.
 // Name is used to create a symbol for vue's provide
 // So keey it unique
 // TODO - check "name" uniqueness
-export type CreateStoreConfig<
-  T extends State,
-  U extends Actions,
-  V extends Getters
-> = {
+export type CreateStoreConfig<T extends State, U extends Actions> = {
   name: string;
   initialState: T;
   actionsCreator: ActionsCreator<T, U>;
-  gettersCreator: GettersCreator<T, V>;
 };
 
-// ComputedGetterRefs wraps all getters defined in GettersCreator
-// with vue's ComputedRef.
-// For typing help, we make sure the keys and return types
-// of the the getters is maintained.
-export type ComputedGetterRefs<T extends Getters> = {
-  [K in keyof T]: ComputedRef<ReturnType<T[K]>>;
-};
-
-export type StoreAPI<T extends State, U extends Actions, V extends Getters> = {
+export type StoreAPI<T extends State, U extends Actions> = {
   readonly state: ToRefs<ReactiveState<T>>;
   actions: U;
-  getters: ComputedGetterRefs<V>;
 };
 
 // Store is returned by createStore()
-export type Store<T extends State, U extends Actions, V extends Getters> = {
+export type Store<T extends State, U extends Actions> = {
   readonly name: string;
-  storeAPI: StoreAPI<T, U, V>;
+  storeAPI: StoreAPI<T, U>;
   install: (app: App) => void; // makes Store implement Plugin from vue
   readonly storeKey: symbol;
   provider: () => void;
@@ -99,16 +71,12 @@ export type Store<T extends State, U extends Actions, V extends Getters> = {
 // The store contains an install() method so we can use it
 // with App.use(). This provides any components at a lower
 // tree-level to access the store.
-const createStore = <
-  TState extends State,
-  TActions extends Actions,
-  TGetters extends Getters
->(
-  config: CreateStoreConfig<TState, TActions, TGetters>
-): Store<TState, TActions, TGetters> => {
+const createStore = <TState extends State, TActions extends Actions>(
+  config: CreateStoreConfig<TState, TActions>
+): Store<TState, TActions> => {
   const reactiveState = reactive(config.initialState);
 
-  const { actionsCreator, gettersCreator } = config;
+  const { actionsCreator } = config;
 
   // TODO - create history tracking / state snapshots
   const mutate: Mutator<TState> = mutatorFunc => {
@@ -120,20 +88,10 @@ const createStore = <
   const get = (): ReactiveState<TState> => reactiveState;
 
   const actions = actionsCreator(mutate, get);
-  const getters = gettersCreator(reactiveState);
 
-  // Wrap getters in vue's computed
-  const computedGetterRefs: ComputedGetterRefs<TGetters> = Object.assign({});
-
-  for (const key in getters) {
-    const getterFunc = getters[key];
-    computedGetterRefs[key] = computed(getterFunc);
-  }
-
-  const storeAPI: StoreAPI<TState, TActions, TGetters> = {
+  const storeAPI: StoreAPI<TState, TActions> = {
     state: toRefs(reactiveState),
     actions: actions,
-    getters: computedGetterRefs,
   };
 
   // Create symbol from store name
@@ -150,7 +108,7 @@ const createStore = <
 
   const provider = () => provide(storeKey, storeAPI);
 
-  const store: Store<TState, TActions, TGetters> = {
+  const store: Store<TState, TActions> = {
     name: config.name,
     storeAPI,
     install,
@@ -161,10 +119,10 @@ const createStore = <
   return store;
 };
 
-const useStore = <T extends State, U extends Actions, V extends Getters>(
-  store: Store<T, U, V>
-): StoreAPI<T, U, V> => {
-  const storeAPI = inject<StoreAPI<T, U, V>>(store.storeKey);
+const useStore = <T extends State, U extends Actions>(
+  store: Store<T, U>
+): StoreAPI<T, U> => {
+  const storeAPI = inject<StoreAPI<T, U>>(store.storeKey);
   if (!storeAPI) {
     throw new Error(`${store.name} has not been initialized}`);
   }

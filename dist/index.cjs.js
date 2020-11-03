@@ -10,26 +10,18 @@ var vue = require('vue');
 // tree-level to access the store.
 const createStore = (config) => {
     const reactiveState = vue.reactive(config.initialState);
-    const { actionsCreator, gettersCreator } = config;
+    const { actionsCreator } = config;
     // TODO - create history tracking / state snapshots
-    const mutate = (mutatorFunc) => {
+    const mutate = mutatorFunc => {
         mutatorFunc(reactiveState);
         // console.log('New reactive state: ', reactiveState);
     };
     // for providing state to an action creator
     const get = () => reactiveState;
     const actions = actionsCreator(mutate, get);
-    const getters = gettersCreator(reactiveState);
-    // Wrap getters in vue's computed
-    const computedGetterRefs = Object.assign({});
-    for (const key in getters) {
-        const getterFunc = getters[key];
-        computedGetterRefs[key] = vue.computed(getterFunc);
-    }
     const storeAPI = {
         state: vue.toRefs(reactiveState),
         actions: actions,
-        getters: computedGetterRefs,
     };
     // Create symbol from store name
     // This key will be use for injecting store
