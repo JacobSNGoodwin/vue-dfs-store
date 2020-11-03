@@ -4,13 +4,13 @@ type CounterState = {
   count: number;
 };
 
-type CounterActions = {
+type CounterAccessors = {
   incCount: (val: number) => void;
   clearCount: () => void;
   multCount: (val: number) => number;
 };
 
-const counterStore = createStore<CounterState, CounterActions>({
+const counterStore = createStore<CounterState, CounterAccessors>({
   name: 'counterStore',
   initialState: {
     count: 0,

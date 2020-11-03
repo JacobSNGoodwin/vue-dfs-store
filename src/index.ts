@@ -18,8 +18,8 @@ export type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
 
 // Actions can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ActionFunc = (...args: any[]) => any;
-export type Actions = Record<string, ActionFunc>;
+export type AccessorFunc = (...args: any[]) => any;
+export type Accessors = Record<string, AccessorFunc>;
 
 // MutatorFunc receives the state for mutating.
 // Is there anyway to enforce a syncronous function?
@@ -37,7 +37,7 @@ export type GetState<T> = () => ReactiveState<T>;
 // Actions Creator provides actions with a
 // mutator to make state changes and a get to access state
 // inside of actions.
-export type ActionsCreator<T extends State, U extends Actions> = (
+export type ActionsCreator<T extends State, U extends Accessors> = (
   mutate: Mutator<T>,
   get: GetState<T>
 ) => U;
@@ -47,19 +47,19 @@ export type ActionsCreator<T extends State, U extends Actions> = (
 // Name is used to create a symbol for vue's provide
 // So keey it unique
 // TODO - check "name" uniqueness
-export type CreateStoreConfig<T extends State, U extends Actions> = {
+export type CreateStoreConfig<T extends State, U extends Accessors> = {
   name: string;
   initialState: T;
   actionsCreator: ActionsCreator<T, U>;
 };
 
-export type StoreAPI<T extends State, U extends Actions> = {
+export type StoreAPI<T extends State, U extends Accessors> = {
   readonly state: ToRefs<ReactiveState<T>>;
   actions: U;
 };
 
 // Store is returned by createStore()
-export type Store<T extends State, U extends Actions> = {
+export type Store<T extends State, U extends Accessors> = {
   readonly name: string;
   storeAPI: StoreAPI<T, U>;
   install: (app: App) => void; // makes Store implement Plugin from vue
@@ -71,9 +71,9 @@ export type Store<T extends State, U extends Actions> = {
 // The store contains an install() method so we can use it
 // with App.use(). This provides any components at a lower
 // tree-level to access the store.
-const createStore = <TState extends State, TActions extends Actions>(
-  config: CreateStoreConfig<TState, TActions>
-): Store<TState, TActions> => {
+const createStore = <TState extends State, TAccessors extends Accessors>(
+  config: CreateStoreConfig<TState, TAccessors>
+): Store<TState, TAccessors> => {
   const reactiveState = reactive(config.initialState);
 
   const { actionsCreator } = config;
@@ -89,7 +89,7 @@ const createStore = <TState extends State, TActions extends Actions>(
 
   const actions = actionsCreator(mutate, get);
 
-  const storeAPI: StoreAPI<TState, TActions> = {
+  const storeAPI: StoreAPI<TState, TAccessors> = {
     state: toRefs(reactiveState),
     actions: actions,
   };
@@ -108,7 +108,7 @@ const createStore = <TState extends State, TActions extends Actions>(
 
   const provider = () => provide(storeKey, storeAPI);
 
-  const store: Store<TState, TActions> = {
+  const store: Store<TState, TAccessors> = {
     name: config.name,
     storeAPI,
     install,
@@ -119,7 +119,7 @@ const createStore = <TState extends State, TActions extends Actions>(
   return store;
 };
 
-const useStore = <T extends State, U extends Actions>(
+const useStore = <T extends State, U extends Accessors>(
   store: Store<T, U>
 ): StoreAPI<T, U> => {
   const storeAPI = inject<StoreAPI<T, U>>(store.storeKey);
