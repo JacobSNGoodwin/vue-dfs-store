@@ -34,7 +34,7 @@ export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 export type Mutator<T> = (mutator: MutatorFunc<T>) => void;
 
 // GetState used to access the state inside of accessors
-export type GetState<T> = () => ReactiveState<T>;
+export type GetState<T> = () => ReadonlyState<ReactiveState<T>>;
 
 // AccessorsCreator provides accessors with a
 // "mutator" to make state changes and a "get" to access state
@@ -84,7 +84,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   };
 
   // for providing state to an accessorCreator
-  const get = (): ReactiveState<TState> => reactiveState;
+  const get = () => readonly(reactiveState);
 
   const accessors = accessorsCreator(mutate, get);
 

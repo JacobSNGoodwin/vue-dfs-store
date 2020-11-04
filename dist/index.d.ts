@@ -6,7 +6,7 @@ export declare type AccessorFunc = (...args: any[]) => any;
 export declare type Accessors = Record<string, AccessorFunc>;
 export declare type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 export declare type Mutator<T> = (mutator: MutatorFunc<T>) => void;
-export declare type GetState<T> = () => ReactiveState<T>;
+export declare type GetState<T> = () => ReadonlyState<ReactiveState<T>>;
 export declare type AccessorsCreator<T extends State, U extends Accessors> = (mutate: Mutator<T>, get: GetState<T>) => U;
 export declare type CreateStoreConfig<T extends State, U extends Accessors> = {
     name: string;

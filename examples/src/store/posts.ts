@@ -67,7 +67,7 @@ const postStore = createStore<PostState, PostAccessors>({
     },
     getUserPosts: (userId: number | undefined): Post[] => {
       if (!userId) {
-        return get().posts;
+        return [...get().posts];
       }
       return get().posts.filter(post => post.userId === userId);
     },

@@ -13,7 +13,7 @@ const createStore = (config) => {
         // console.log('New reactive state: ', reactiveState);
     };
     // for providing state to an accessorCreator
-    const get = () => reactiveState;
+    const get = () => readonly(reactiveState);
     const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
         state: toRefs(readonly(reactiveState)),
