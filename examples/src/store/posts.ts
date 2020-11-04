@@ -1,4 +1,3 @@
-import { DeepReadonly } from 'vue';
 import { createStore } from '../../../dist';
 import { sleep } from '../util';
 
@@ -18,7 +17,7 @@ type PostState = {
 type PostAccessors = {
   fetchPosts: () => Promise<void>;
   clearPosts: () => void;
-  getUserPosts: (userId: number | undefined) => DeepReadonly<Post[]>;
+  getUserPosts: (userId: number | undefined) => Post[];
 };
 
 const postStore = createStore<PostState, PostAccessors>({
@@ -36,7 +35,7 @@ const postStore = createStore<PostState, PostAccessors>({
       });
 
       try {
-        await sleep(500); // artificial delay to see loader
+        await sleep(700); // artificial delay to see loader
         const response = await fetch(
           'https://jsonplaceholder.typicode.com/posts'
         );
@@ -66,7 +65,7 @@ const postStore = createStore<PostState, PostAccessors>({
     clearPosts: () => {
       mutate(state => (state.posts = []));
     },
-    getUserPosts: (userId: number | undefined): DeepReadonly<Post[]> => {
+    getUserPosts: (userId: number | undefined): Post[] => {
       if (!userId) {
         return get().posts;
       }

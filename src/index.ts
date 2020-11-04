@@ -19,7 +19,7 @@ export type State = Record<string | number | symbol, unknown>;
 export type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
 export type ReadonlyState<T> = DeepReadonly<ReactiveState<T>>;
 
-// Actions can receive any arguments. Hence disable ESLint for now
+// Accessors can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AccessorFunc = (...args: any[]) => any;
 export type Accessors = Record<string, AccessorFunc>;
@@ -33,12 +33,11 @@ export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 // This will allow Mutator to track history or snapshots in later versions.
 export type Mutator<T> = (mutator: MutatorFunc<T>) => void;
 
-// GetState used to access the state (which is readonly) inside
-// of an action
-export type GetState<T> = () => ReadonlyState<ReactiveState<T>>;
+// GetState used to access the state inside of accessors
+export type GetState<T> = () => ReactiveState<T>;
 
-// Actions Creator provides actions with a
-// mutator to make state changes and a get to access state
+// AccessorsCreator provides accessors with a
+// "mutator" to make state changes and a "get" to access state
 // inside of actions.
 export type AccessorsCreator<T extends State, U extends Accessors> = (
   mutate: Mutator<T>,
@@ -46,20 +45,20 @@ export type AccessorsCreator<T extends State, U extends Accessors> = (
 ) => U;
 
 // CreateStoreConfig used to initialize the state
-// and define actions and getters.
+// and define state accessors
 export type CreateStoreConfig<T extends State, U extends Accessors> = {
   name: string;
   initialState: T;
   accessorsCreator: AccessorsCreator<T, U>;
 };
 
-export type StoreAPI<T extends State, U extends Accessors> = {
+export type StoreAPI<T, U> = {
   readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
   accessors: U;
 };
 
 // Store is returned by createStore()
-export type Store<T extends State, U extends Accessors> = {
+export type Store<T, U> = {
   readonly name: string;
   storeAPI: StoreAPI<T, U>;
   install: (app: App) => void; // makes Store implement Plugin from vue
@@ -84,9 +83,8 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
     // console.log('New reactive state: ', reactiveState);
   };
 
-  // for providing state to an action creator
-  const get = (): ReadonlyState<ReactiveState<TState>> =>
-    readonly(reactiveState);
+  // for providing state to an accessorCreator
+  const get = (): ReactiveState<TState> => reactiveState;
 
   const accessors = accessorsCreator(mutate, get);
 

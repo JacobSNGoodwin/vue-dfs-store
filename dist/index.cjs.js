@@ -16,8 +16,8 @@ const createStore = (config) => {
         mutatorFunc(reactiveState);
         // console.log('New reactive state: ', reactiveState);
     };
-    // for providing state to an action creator
-    const get = () => vue.readonly(reactiveState);
+    // for providing state to an accessorCreator
+    const get = () => reactiveState;
     const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
         state: vue.toRefs(vue.readonly(reactiveState)),
