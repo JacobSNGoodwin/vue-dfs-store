@@ -11,10 +11,11 @@ var vue = require('vue');
 const createStore = (config) => {
     const reactiveState = vue.reactive(config.initialState);
     const { accessorsCreator } = config;
-    // TODO - create history tracking / state snapshots
     const mutate = mutatorFunc => {
         mutatorFunc(reactiveState);
-        // console.log('New reactive state: ', reactiveState);
+        if (config.mutatorHook) {
+            config.mutatorHook(vue.readonly(reactiveState));
+        }
     };
     // for providing state to an accessorCreator
     const get = () => vue.readonly(reactiveState);

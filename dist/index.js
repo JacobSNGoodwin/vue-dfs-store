@@ -7,10 +7,11 @@ import { reactive, toRefs, readonly, inject, provide } from 'vue';
 const createStore = (config) => {
     const reactiveState = reactive(config.initialState);
     const { accessorsCreator } = config;
-    // TODO - create history tracking / state snapshots
     const mutate = mutatorFunc => {
         mutatorFunc(reactiveState);
-        // console.log('New reactive state: ', reactiveState);
+        if (config.mutatorHook) {
+            config.mutatorHook(readonly(reactiveState));
+        }
     };
     // for providing state to an accessorCreator
     const get = () => readonly(reactiveState);

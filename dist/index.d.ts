@@ -8,10 +8,12 @@ export declare type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 export declare type Mutator<T> = (mutator: MutatorFunc<T>) => void;
 export declare type GetState<T> = () => ReadonlyState<ReactiveState<T>>;
 export declare type AccessorsCreator<T extends State, U extends Accessors> = (mutate: Mutator<T>, get: GetState<T>) => U;
+export declare type MutatorHook<T> = (state: ReadonlyState<ReactiveState<T>>) => void;
 export declare type CreateStoreConfig<T extends State, U extends Accessors> = {
     name: string;
     initialState: T;
     accessorsCreator: AccessorsCreator<T, U>;
+    mutatorHook?: MutatorHook<T>;
 };
 export declare type StoreAPI<T, U> = {
     readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;

@@ -20,6 +20,7 @@ const counterStore = createStore<CounterState, CounterAccessors>({
     clearCount: () => mutate(state => (state.count = 0)),
     multCount: (val: number) => get().count * val,
   }),
+  mutatorHook: state => console.log(state),
 });
 
 export default counterStore;

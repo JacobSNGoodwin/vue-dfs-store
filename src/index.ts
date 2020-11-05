@@ -44,12 +44,15 @@ export type AccessorsCreator<T extends State, U extends Accessors> = (
   get: GetState<T>
 ) => U;
 
+export type MutatorHook<T> = (state: ReadonlyState<ReactiveState<T>>) => void;
+
 // CreateStoreConfig used to initialize the state
 // and define state accessors
 export type CreateStoreConfig<T extends State, U extends Accessors> = {
   name: string;
   initialState: T;
   accessorsCreator: AccessorsCreator<T, U>;
+  mutatorHook?: MutatorHook<T>;
 };
 
 export type StoreAPI<T, U> = {
@@ -77,10 +80,12 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
 
   const { accessorsCreator } = config;
 
-  // TODO - create history tracking / state snapshots
   const mutate: Mutator<TState> = mutatorFunc => {
     mutatorFunc(reactiveState);
-    // console.log('New reactive state: ', reactiveState);
+
+    if (config.mutatorHook) {
+      config.mutatorHook(readonly(reactiveState));
+    }
   };
 
   // for providing state to an accessorCreator
