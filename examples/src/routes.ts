@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 import Counter from './views/Counter.vue';
-import FetchData from './views/FetchData.vue';
+import FetchPosts from './views/FetchPosts.vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -10,9 +10,9 @@ const routes: RouteRecordRaw[] = [
     component: Counter,
   },
   {
-    path: '/fetch-data',
-    name: 'Fetch Data',
-    component: FetchData,
+    path: '/fetch-posts',
+    name: 'Fetch Posts',
+    component: FetchPosts,
   },
 ];
 

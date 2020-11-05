@@ -1,4 +1,4 @@
-import { reactive, computed, toRefs, inject, provide } from 'vue';
+import { reactive, toRefs, readonly, inject, provide } from 'vue';
 
 // createStore initializes the store
 // The store contains an install() method so we can use it
@@ -6,26 +6,19 @@ import { reactive, computed, toRefs, inject, provide } from 'vue';
 // tree-level to access the store.
 const createStore = (config) => {
     const reactiveState = reactive(config.initialState);
-    const { actionsCreator, gettersCreator } = config;
-    // TODO - create history tracking / state snapshots
-    const mutate = (mutatorFunc) => {
+    const { accessorsCreator } = config;
+    const mutate = mutatorFunc => {
         mutatorFunc(reactiveState);
-        // console.log('New reactive state: ', reactiveState);
+        if (config.mutatorHook) {
+            config.mutatorHook(readonly(reactiveState));
+        }
     };
-    // for providing state to an action creator
-    const get = () => reactiveState;
-    const actions = actionsCreator(mutate, get);
-    const getters = gettersCreator(reactiveState);
-    // Wrap getters in vue's computed
-    const computedGetterRefs = Object.assign({});
-    for (const key in getters) {
-        const getterFunc = getters[key];
-        computedGetterRefs[key] = computed(getterFunc);
-    }
+    // for providing state to an accessorCreator
+    const get = () => readonly(reactiveState);
+    const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
-        state: toRefs(reactiveState),
-        actions: actions,
-        getters: computedGetterRefs,
+        state: toRefs(readonly(reactiveState)),
+        accessors,
     };
     // Create symbol from store name
     // This key will be use for injecting store
@@ -33,7 +26,6 @@ const createStore = (config) => {
     const storeKey = Symbol();
     // for use with App.use(),
     // it will allow providing the store in app.use
-    // TODO: export a provider directly to use down-tree? Add to global context?
     const install = (app) => {
         app.provide(storeKey, storeAPI);
     };

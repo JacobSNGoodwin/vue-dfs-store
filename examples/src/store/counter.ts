@@ -4,31 +4,23 @@ type CounterState = {
   count: number;
 };
 
-type CounterActions = {
+type CounterAccessors = {
   incCount: (val: number) => void;
-  multCount: (val: number) => number;
   clearCount: () => void;
+  multCount: (val: number) => number;
 };
 
-type CounterGetters = {
-  doubleCount: () => number;
-};
-
-const counterStore = createStore<CounterState, CounterActions, CounterGetters>({
+const counterStore = createStore<CounterState, CounterAccessors>({
   name: 'counterStore',
   initialState: {
     count: 0,
   },
-  actionsCreator: (mutate, get) => ({
+  accessorsCreator: (mutate, get) => ({
     incCount: (val: number) => mutate(state => (state.count += val)),
-    multCount: (val: number) => {
-      return get().count * val;
-    },
     clearCount: () => mutate(state => (state.count = 0)),
+    multCount: (val: number) => get().count * val,
   }),
-  gettersCreator: state => ({
-    doubleCount: () => state.count * 2,
-  }),
+  mutatorHook: state => console.log(state),
 });
 
 export default counterStore;
