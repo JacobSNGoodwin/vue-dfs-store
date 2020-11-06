@@ -18,10 +18,13 @@ export type State = Record<string | number | symbol, unknown>;
 // The type that would be returned by Vue's reactive(someState)
 export type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
 export type ReadonlyState<T> = DeepReadonly<ReactiveState<ReactiveState<T>>>;
+export type ReadonlyState2<T> = T extends ReactiveState<infer V>
+  ? DeepReadonly<V>
+  : DeepReadonly<ReactiveState<T>>;
 
 // Accessors can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AccessorFunc = (...args: any[]) => any;
+export type AccessorFunc = (...args: any[]) => unknown;
 export type Accessors = Record<string, AccessorFunc>;
 
 // MutatorFunc receives the state for mutating.
@@ -125,7 +128,13 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
 
 const useStore = <T extends State, U extends Accessors>(
   store: Store<T, U>
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-): StoreAPI<T, U> => inject<StoreAPI<T, U>>(store.storeKey)!;
+): StoreAPI<T, U> => {
+  const storeAPI = inject<StoreAPI<T, U>>(store.storeKey);
+  if (!storeAPI) {
+    throw new Error(`${store.name} has not been initialized}`);
+  }
+
+  return storeAPI;
+};
 
 export { createStore, useStore };
