@@ -44,13 +44,9 @@ const createStore = (config) => {
     };
     return store;
 };
-const useStore = (store) => {
-    const storeAPI = vue.inject(store.storeKey);
-    if (!storeAPI) {
-        throw new Error(`${store.name} has not been initialized}`);
-    }
-    return storeAPI;
-};
+const useStore = (store
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+) => vue.inject(store.storeKey);
 
 exports.createStore = createStore;
 exports.useStore = useStore;

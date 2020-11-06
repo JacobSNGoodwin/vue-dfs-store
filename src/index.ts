@@ -125,13 +125,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
 
 const useStore = <T extends State, U extends Accessors>(
   store: Store<T, U>
-): StoreAPI<T, U> => {
-  const storeAPI = inject<StoreAPI<T, U>>(store.storeKey);
-  if (!storeAPI) {
-    throw new Error(`${store.name} has not been initialized}`);
-  }
-
-  return storeAPI;
-};
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+): StoreAPI<T, U> => inject<StoreAPI<T, U>>(store.storeKey)!;
 
 export { createStore, useStore };
