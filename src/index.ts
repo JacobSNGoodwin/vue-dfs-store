@@ -7,8 +7,8 @@ import {
   provide,
   App,
   inject,
-  readonly,
-  DeepReadonly,
+  // readonly,
+  // DeepReadonly,
 } from 'vue';
 
 // State is a plain old object that can be provided in the config
@@ -17,10 +17,10 @@ export type State = Record<string | number | symbol, unknown>;
 // Same UnwrapNestedRef, which Vue doesn't export.
 // The type that would be returned by Vue's reactive(someState)
 export type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
-export type ReadonlyState<T> = DeepReadonly<ReactiveState<ReactiveState<T>>>;
-export type ReadonlyState2<T> = T extends ReactiveState<infer V>
-  ? DeepReadonly<V>
-  : DeepReadonly<ReactiveState<T>>;
+// export type ReadonlyState<T> = DeepReadonly<ReactiveState<ReactiveState<T>>>;
+// export type ReadonlyState<T> = T extends ReactiveState<infer V>
+//   ? DeepReadonly<V>
+//   : DeepReadonly<ReactiveState<T>>;
 
 // Accessors can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,7 +37,7 @@ export type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 export type Mutator<T> = (mutator: MutatorFunc<T>) => void;
 
 // GetState used to access the state inside of accessors
-export type GetState<T> = () => ReadonlyState<T>;
+export type GetState<T> = () => ReactiveState<T>;
 
 // AccessorsCreator provides accessors with a
 // "mutator" to make state changes and a "get" to access state
@@ -47,7 +47,7 @@ export type AccessorsCreator<T extends State, U extends Accessors> = (
   get: GetState<T>
 ) => U;
 
-export type MutatorHook<T> = (state: ReadonlyState<T>) => void;
+export type MutatorHook<T> = (state: ReactiveState<T>) => void;
 
 // CreateStoreConfig used to initialize the state
 // and define state accessors
@@ -59,7 +59,7 @@ export type CreateStoreConfig<T extends State, U extends Accessors> = {
 };
 
 export type StoreAPI<T extends State, U extends Accessors> = {
-  readonly state: ToRefs<ReadonlyState<T>>;
+  readonly state: ToRefs<ReactiveState<T>>;
   accessors: U;
 };
 
@@ -80,7 +80,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   config: CreateStoreConfig<TState, TAccessors>
 ): Store<TState, TAccessors> => {
   const reactiveState = reactive(config.initialState);
-  const readonlyState = readonly(reactiveState);
+  // const readonlyState = readonly(reactiveState);
 
   const { accessorsCreator } = config;
 
@@ -88,17 +88,17 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
     mutatorFunc(reactiveState);
 
     if (config.mutatorHook) {
-      config.mutatorHook(readonlyState);
+      config.mutatorHook(reactiveState);
     }
   };
 
   // for providing state to an accessorCreator
-  const get = () => readonlyState;
+  const get = () => reactiveState;
 
   const accessors = accessorsCreator(mutate, get);
 
   const storeAPI: StoreAPI<TState, TAccessors> = {
-    state: toRefs(readonlyState),
+    state: toRefs(reactiveState),
     accessors,
   };
 
