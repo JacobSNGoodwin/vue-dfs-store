@@ -1,11 +1,12 @@
-import { Ref, UnwrapRef, ToRefs, App } from 'vue';
+import { Ref, UnwrapRef, App, DeepReadonly } from 'vue';
 export declare type State = Record<string | number | symbol, unknown>;
 export declare type ReactiveState<T> = T extends Ref ? T : UnwrapRef<T>;
+export declare type ReadonlyState<T> = DeepReadonly<ReactiveState<T>>;
 export declare type AccessorFunc = (...args: any[]) => unknown;
 export declare type Accessors = Record<string, AccessorFunc>;
 export declare type MutatorFunc<T> = (state: ReactiveState<T>) => void;
 export declare type Mutator<T> = (mutator: MutatorFunc<T>) => void;
-export declare type GetState<T> = () => ReactiveState<T>;
+export declare type GetState<T> = () => ReadonlyState<ReactiveState<T>>;
 export declare type AccessorsCreator<T extends State, U extends Accessors> = (mutate: Mutator<T>, get: GetState<T>) => U;
 export declare type MutatorHook<T> = (state: ReactiveState<T>) => void;
 export declare type CreateStoreConfig<T extends State, U extends Accessors> = {
@@ -15,7 +16,7 @@ export declare type CreateStoreConfig<T extends State, U extends Accessors> = {
     mutatorHook?: MutatorHook<T>;
 };
 export declare type StoreAPI<T extends State, U extends Accessors> = {
-    readonly state: ToRefs<ReactiveState<T>>;
+    readonly state: ReadonlyState<ReactiveState<T>>;
     accessors: U;
 };
 export declare type Store<T extends State, U extends Accessors> = {

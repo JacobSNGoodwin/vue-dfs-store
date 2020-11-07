@@ -9,7 +9,7 @@
     <button @click="clearPosts">Clear Posts</button>
   </div>
 
-  <Loader v-if="loading" color="#b83a00bf" />
+  <Loader v-if="isFetching" color="#b83a00bf" />
   <div v-else v-for="post in filteredPosts" :key="post.id" class="posts">
     <h3>{{ post.title }}</h3>
     <h4>User: {{ post.userId }}</h4>
@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, ref, toRefs } from 'vue';
 import { useStore } from '../../../dist';
 import postStore from '../store/posts';
 import Loader from '../components/Loader';
@@ -34,10 +34,12 @@ export default defineComponent({
       accessors.getUserPosts(selectedUserId.value)
     );
 
+    const { isFetching } = toRefs(state);
+
     return {
       fetchPosts: accessors.fetchPosts,
       clearPosts: accessors.clearPosts,
-      loading: state.isFetching,
+      isFetching,
       selectedUserId,
       filteredPosts,
     };

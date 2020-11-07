@@ -1,4 +1,4 @@
-import { reactive, toRefs, inject, provide } from 'vue';
+import { reactive, readonly, inject, provide } from 'vue';
 
 // createStore initializes the store
 // The store contains an install() method so we can use it
@@ -15,10 +15,10 @@ const createStore = (config) => {
         }
     };
     // for providing state to an accessorCreator
-    const get = () => reactiveState;
+    const get = () => readonly(reactiveState);
     const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
-        state: toRefs(reactiveState),
+        state: readonly(reactiveState),
         accessors,
     };
     // Create symbol from store name

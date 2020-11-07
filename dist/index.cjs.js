@@ -19,10 +19,10 @@ const createStore = (config) => {
         }
     };
     // for providing state to an accessorCreator
-    const get = () => reactiveState;
+    const get = () => vue.readonly(reactiveState);
     const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
-        state: vue.toRefs(reactiveState),
+        state: vue.readonly(reactiveState),
         accessors,
     };
     // Create symbol from store name
