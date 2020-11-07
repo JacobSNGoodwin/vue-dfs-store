@@ -1,5 +1,5 @@
 <template>
-  <h2>Count: {{ state.count }}</h2>
+  <h2>Count: {{ count }}</h2>
 
   <h3>Multiplier</h3>
   <input type="number" v-model.number="multiplier" />
@@ -34,7 +34,7 @@ export default defineComponent({
     );
 
     return {
-      state: state,
+      count: state.count,
       incCount: accessors.incCount,
       clearCount: accessors.clearCount,
       multiplier,

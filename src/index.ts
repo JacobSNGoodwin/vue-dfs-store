@@ -56,7 +56,7 @@ export type CreateStoreConfig<T extends State, U extends Accessors> = {
 };
 
 export type StoreAPI<T extends State, U extends Accessors> = {
-  readonly state: ReadonlyState<ReactiveState<T>>;
+  readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
   accessors: U;
 };
 
@@ -77,7 +77,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   config: CreateStoreConfig<TState, TAccessors>
 ): Store<TState, TAccessors> => {
   const reactiveState = reactive(config.initialState);
-  // const readonlyState = readonly(reactiveState);
+  const readonlyState = readonly(reactiveState);
 
   const { accessorsCreator } = config;
 
@@ -90,12 +90,12 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   };
 
   // for providing state to an accessorCreator
-  const get = () => readonly(reactiveState);
+  const get = () => readonlyState;
 
   const accessors = accessorsCreator(mutate, get);
 
   const storeAPI: StoreAPI<TState, TAccessors> = {
-    state: readonly(reactiveState),
+    state: toRefs(readonlyState),
     accessors,
   };
 

@@ -10,7 +10,7 @@ var vue = require('vue');
 // tree-level to access the store.
 const createStore = (config) => {
     const reactiveState = vue.reactive(config.initialState);
-    // const readonlyState = readonly(reactiveState);
+    const readonlyState = vue.readonly(reactiveState);
     const { accessorsCreator } = config;
     const mutate = mutatorFunc => {
         mutatorFunc(reactiveState);
@@ -19,10 +19,10 @@ const createStore = (config) => {
         }
     };
     // for providing state to an accessorCreator
-    const get = () => vue.readonly(reactiveState);
+    const get = () => readonlyState;
     const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
-        state: vue.readonly(reactiveState),
+        state: vue.toRefs(readonlyState),
         accessors,
     };
     // Create symbol from store name
