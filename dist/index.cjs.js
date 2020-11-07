@@ -22,7 +22,7 @@ const createStore = (config) => {
     const get = () => readonlyState;
     const accessors = accessorsCreator(mutate, get);
     const storeAPI = {
-        state: vue.toRefs(readonlyState),
+        state: readonlyState,
         accessors,
     };
     // Create symbol from store name

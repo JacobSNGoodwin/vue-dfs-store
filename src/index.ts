@@ -2,8 +2,6 @@ import {
   Ref,
   UnwrapRef,
   reactive,
-  ToRefs,
-  toRefs,
   provide,
   App,
   inject,
@@ -56,7 +54,7 @@ export type CreateStoreConfig<T extends State, U extends Accessors> = {
 };
 
 export type StoreAPI<T extends State, U extends Accessors> = {
-  readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
+  readonly state: ReadonlyState<ReactiveState<T>>;
   accessors: U;
 };
 
@@ -95,7 +93,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   const accessors = accessorsCreator(mutate, get);
 
   const storeAPI: StoreAPI<TState, TAccessors> = {
-    state: toRefs(readonlyState),
+    state: readonlyState,
     accessors,
   };
 
