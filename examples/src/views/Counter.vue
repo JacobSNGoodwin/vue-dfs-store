@@ -1,5 +1,5 @@
 <template>
-  <h2>Count: {{ count }}</h2>
+  <h2>Count: {{ state.count }}</h2>
 
   <h3>Multiplier</h3>
   <input type="number" v-model.number="multiplier" />
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, toRefs } from 'vue';
 import { useStore } from '../../../dist';
 import counterStore from '../store/counter';
 
@@ -29,12 +29,15 @@ export default defineComponent({
     const multiplier = ref(0);
     const { state, accessors } = useStore(counterStore);
 
+    const { count } = toRefs(state);
+
     const multipliedCount = computed(() =>
       accessors.multCount(multiplier.value)
     );
 
     return {
-      count: state.count,
+      state,
+      count,
       incCount: accessors.incCount,
       clearCount: accessors.clearCount,
       multiplier,

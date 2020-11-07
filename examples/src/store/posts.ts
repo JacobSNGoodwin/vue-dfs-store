@@ -72,6 +72,7 @@ const postStore = createStore<PostState, PostAccessors>({
       return get().posts.filter(post => post.userId === userId);
     },
   }),
+  mutatorHook: state => console.log(state),
 });
 
 export default postStore;

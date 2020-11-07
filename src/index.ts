@@ -2,8 +2,6 @@ import {
   Ref,
   UnwrapRef,
   reactive,
-  ToRefs,
-  toRefs,
   provide,
   App,
   inject,
@@ -21,7 +19,7 @@ export type ReadonlyState<T> = DeepReadonly<ReactiveState<T>>;
 
 // Accessors can receive any arguments. Hence disable ESLint for now
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AccessorFunc = (...args: any[]) => any;
+export type AccessorFunc = (...args: any[]) => unknown;
 export type Accessors = Record<string, AccessorFunc>;
 
 // MutatorFunc receives the state for mutating.
@@ -44,7 +42,7 @@ export type AccessorsCreator<T extends State, U extends Accessors> = (
   get: GetState<T>
 ) => U;
 
-export type MutatorHook<T> = (state: ReadonlyState<ReactiveState<T>>) => void;
+export type MutatorHook<T> = (state: ReactiveState<T>) => void;
 
 // CreateStoreConfig used to initialize the state
 // and define state accessors
@@ -55,13 +53,13 @@ export type CreateStoreConfig<T extends State, U extends Accessors> = {
   mutatorHook?: MutatorHook<T>;
 };
 
-export type StoreAPI<T, U> = {
-  readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
+export type StoreAPI<T extends State, U extends Accessors> = {
+  readonly state: ReadonlyState<ReactiveState<T>>;
   accessors: U;
 };
 
 // Store is returned by createStore()
-export type Store<T, U> = {
+export type Store<T extends State, U extends Accessors> = {
   readonly name: string;
   storeAPI: StoreAPI<T, U>;
   install: (app: App) => void; // makes Store implement Plugin from vue
@@ -77,6 +75,7 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
   config: CreateStoreConfig<TState, TAccessors>
 ): Store<TState, TAccessors> => {
   const reactiveState = reactive(config.initialState);
+  const readonlyState = readonly(reactiveState);
 
   const { accessorsCreator } = config;
 
@@ -84,17 +83,17 @@ const createStore = <TState extends State, TAccessors extends Accessors>(
     mutatorFunc(reactiveState);
 
     if (config.mutatorHook) {
-      config.mutatorHook(readonly(reactiveState));
+      config.mutatorHook(reactiveState);
     }
   };
 
   // for providing state to an accessorCreator
-  const get = () => readonly(reactiveState);
+  const get = () => readonlyState;
 
   const accessors = accessorsCreator(mutate, get);
 
   const storeAPI: StoreAPI<TState, TAccessors> = {
-    state: toRefs(readonly(reactiveState)),
+    state: readonlyState,
     accessors,
   };
 
