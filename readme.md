@@ -4,7 +4,7 @@ This Typescript library wraps Vue's reactivity API for simply initializing and a
 
 The library works as a plugin so that stores can be injected in `app.use()` statements when initializing an application, or via an exported *provider* which can be used inside of a `setup()` method at the application level of your choice! 
 
-*Provide/injecct have not yet been tested with Options API*.
+*Provide/inject have not yet been tested with Options API*.
 
 ## Provided Demo App
 
@@ -22,11 +22,11 @@ import { createStore, useStore } from 'vue-dfs-store';
 
 ### Create Store
 
-Let's show how to use this with... a counter app because I lack any sense of originiality. This is the same counter demonstrated above!
+Let's show how to use this with... a counter app because I lack any sense of originality. This is the same counter demonstrated above!
 
 Use the createStore function with the following properties provided in a configuration object.
 
-The configuration recieve a `name`, an `initialState` object, an `accessorsCreator`, and a `mutatorHook`. 
+The configuration receive a `name`, an `initialState` object, an `accessorsCreator`, and a `mutatorHook`. 
 
 The `accessorsCreator` receives `mutate` and `get` functions. 
 
