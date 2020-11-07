@@ -1,6 +1,6 @@
 {
   "name": "vue-dfs-store",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A dead-!@#$%-simple store for VueJS using the built-in Vue reactivity system and inspired by Zustand actions",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
