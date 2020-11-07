@@ -22,11 +22,11 @@ import { createStore, useStore } from 'vue-dfs-store';
 
 ### Create Store
 
-Let's show how to use this with... a counter app because nothing under the sun is new. This is the same counter demoed at the top of this readme!
+Let's show how to use this with... a counter app because I lack any sense of originiality. This is the same counter demonstrated above!
 
 Use the createStore function with the following properties provided in a configuration object.
 
-The configuration recieve a `name`, an `initialState` object, an `accessorsCreator`, and a `mutatorHook`. (So far all required, but this may change).
+The configuration recieve a `name`, an `initialState` object, an `accessorsCreator`, and a `mutatorHook`. 
 
 The `accessorsCreator` receives `mutate` and `get` functions. 
 
@@ -39,6 +39,8 @@ The only access to the store's mutable state is provided by the `mutate` method.
 You may provide explicit types for the state and accessors (as shown below) to `createState`, or you may rely on inferred types.
 
 ```ts
+import { createStore } from '../../../dist';
+
 type CounterState = {
   count: number;
 };
@@ -82,13 +84,13 @@ export type Store<T, U> = {
 The most important property to you, the end user, is probably `storeAPI`. This is the object that will be returned when a user accesses the store inside of Vue components with the `useStore` function/composable.
 
 ```ts
-export type StoreAPI<T, U> = {
-  readonly state: ToRefs<ReadonlyState<ReactiveState<T>>>;
+export type StoreAPI<T extends State, U extends Accessors> = {
+  readonly state: ReadonlyState<ReactiveState<T>>;
   accessors: U;
 };
 ```
 
-The `StoreAPI` provides components with readonly state and accessor methods. For those familiar with Vue reactivty, note that the state returns the reactive state with [ref properties (`ToRefs`)](https://composition-api.vuejs.org/api.html#torefs). This is so that the components can pass the individual properties to their Vue templates. 
+The `StoreAPI` provides components with readonly, reactive state object and accessor methods.
 
 ### Provide Store
 
@@ -112,11 +114,13 @@ You can also import and execute `provider()` from the store inside of any setup 
 
 Import the `useStore` function and pass it the store we just created to get access to the readonly state and accessors. Look at how we can use an accessor method inside of a `computed` to recalculate the `multCount` method when it's reactive dependency, `multiplier` is updated.
 
+If you need to "spread" to reactive state object returned from useStore, use [toRefs](https://v3.vuejs.org/api/refs-api.html#torefs).
+
 ```vue
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-import { useStore } from 'vue-dfs-store';
-import counterStore from '../store/counter'; // or whatever hte path is to your counter
+import { defineComponent, ref, computed, toRefs } from 'vue';
+import { useStore } from '../../../dist';
+import counterStore from '../store/counter';
 
 export default defineComponent({
   name: 'Counter',
@@ -124,13 +128,15 @@ export default defineComponent({
     const multiplier = ref(0);
     const { state, accessors } = useStore(counterStore);
 
-    // wrap an accessor in computer to create a "getter"
+    const { count } = toRefs(state);
+
     const multipliedCount = computed(() =>
       accessors.multCount(multiplier.value)
     );
 
     return {
-      count: state.count,
+      state,
+      count,
       incCount: accessors.incCount,
       clearCount: accessors.clearCount,
       multiplier,
@@ -150,3 +156,38 @@ To run the demo application:
 3. `npm run dev` / `yarn dev` - This runs the Rollup config and runs a demo Vue app stored in the *examples* folder with the newly compiled library.
 
 Enjoy, my friends!
+
+
+## Seeking Help with Following Issue
+
+I wanted the `storeAPI` to directly provide access to the spread, `toRefs`, version of the state when calling `useStore()`. However I kept getting the following Typescript error when I wrapped the readonly state in ToRefs: 
+
+> error TS2590: Build:Expression produces a union type that is too complex to represent.
+
+I did find some issues addressing this, but could not determine how to simplify my Typescript to fix this. My suspicion if that the complexity of `DeepReadonly`from vue's reactivity typing, combined with `ToRefs` and this library's types was just creating too complex of a type. 
+
+Below is the type used when creating a DeepReadonly (with `readonly()`) in [Vue3](https://github.com/vuejs/vue-next/blob/master/packages/reactivity/src/reactive.ts).
+
+```ts
+type Primitive = string | number | boolean | bigint | symbol | undefined | null
+type Builtin = Primitive | Function | Date | Error | RegExp
+export type DeepReadonly<T> = T extends Builtin
+  ? T
+  : T extends Map<infer K, infer V>
+    ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
+    : T extends ReadonlyMap<infer K, infer V>
+      ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
+      : T extends WeakMap<infer K, infer V>
+        ? WeakMap<DeepReadonly<K>, DeepReadonly<V>>
+        : T extends Set<infer U>
+          ? ReadonlySet<DeepReadonly<U>>
+          : T extends ReadonlySet<infer U>
+            ? ReadonlySet<DeepReadonly<U>>
+            : T extends WeakSet<infer U>
+              ? WeakSet<DeepReadonly<U>>
+              : T extends Promise<infer U>
+                ? Promise<DeepReadonly<U>>
+                : T extends {}
+                  ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+                  : Readonly<T>
+```
