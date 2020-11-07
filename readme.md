@@ -72,7 +72,8 @@ export default counterStore;
 `createStore` returns the following, where U and V generics will be the types of the reactive version of the state, and the accessors created by `accessorsCreator`, respectively.
 
 ```ts
-export type Store<T, U> = {
+// Store is returned by createStore()
+export type Store<T extends State, U extends Accessors> = {
   readonly name: string;
   storeAPI: StoreAPI<T, U>;
   install: (app: App) => void; // makes Store implement Plugin from vue
